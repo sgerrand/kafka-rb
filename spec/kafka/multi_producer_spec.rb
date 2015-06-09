@@ -13,12 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-require File.dirname(__FILE__) + '/spec_helper'
+require 'spec_helper'
 
-describe MultiProducer do
+describe Kafka::MultiProducer do
+  let(:socket) { double(TCPSocket) }
+
   before(:each) do
-    @mocked_socket = mock(TCPSocket)
-    TCPSocket.stub!(:new).and_return(@mocked_socket) # don't use a real socket
+    allow(TCPSocket).to receive(:new).and_return(socket) # don't use a real socket
   end
 
   describe "Kafka Producer" do
@@ -47,7 +48,7 @@ describe MultiProducer do
         Kafka::ProducerRequest.new("topic", messages[0]),
         Kafka::ProducerRequest.new("topic", messages[1]),
       ]
-      encoded = Encoder.multiproduce(reqs)
+      encoded = Kafka::Encoder.multiproduce(reqs)
 
       subject.should_receive(:write).with(encoded).and_return(encoded.length)
       subject.multi_push(reqs).should == encoded.length
@@ -55,19 +56,19 @@ describe MultiProducer do
 
     it "should compress messages" do
       subject.compression = Kafka::Message::SNAPPY_COMPRESSION
-      @mocked_socket.stub! :write => 0
+      allow(socket).to receive(:write).and_return 0
       messages = [Kafka::Message.new("ale"), Kafka::Message.new("beer")]
 
-      encoded = Encoder.produce("test", 0, messages[0])
-      Encoder.should_receive(:produce).with("test", 0, messages[0], subject.compression).and_return encoded
+      encoded = Kafka::Encoder.produce("test", 0, messages[0])
+      Kafka::Encoder.should_receive(:produce).with("test", 0, messages[0], subject.compression).and_return encoded
       subject.push("test", messages[0], :partition => 0)
 
       reqs = [
           Kafka::ProducerRequest.new("topic", messages[0]),
           Kafka::ProducerRequest.new("topic", messages[1]),
       ]
-      encoded = Encoder.multiproduce(reqs)
-      Encoder.should_receive(:multiproduce).with(reqs, subject.compression)
+      encoded = Kafka::Encoder.multiproduce(reqs)
+      Kafka::Encoder.should_receive(:multiproduce).with(reqs, subject.compression)
       subject.multi_push(reqs)
     end
   end

@@ -30,11 +30,9 @@ task :install => [:package] do
   sh %{sudo gem install pkg/#{GEM}-#{GEM_VERSION}}
 end
 
-desc "Run specs"
 RSpec::Core::RakeTask.new do |t|
   t.pattern = FileList['spec/**/*_spec.rb']
-  t.rspec_opts = %w(-fs --color)
+  t.rspec_opts = %w(--format documentation --color)
 end
 
 task :default => :spec
-

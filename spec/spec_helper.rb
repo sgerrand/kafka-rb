@@ -14,5 +14,3 @@
 # limitations under the License.
 require 'rubygems'
 require 'kafka'
-
-include Kafka

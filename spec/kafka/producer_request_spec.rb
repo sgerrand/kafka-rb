@@ -13,9 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-require File.dirname(__FILE__) + '/spec_helper'
+require 'spec_helper'
 
-describe ProducerRequest do
+describe Kafka::ProducerRequest do
   let(:message) { Kafka::Message.new }
   let(:req) { described_class.new("topic", message) }
 

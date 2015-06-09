@@ -12,24 +12,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-require File.dirname(__FILE__) + '/spec_helper'
+require 'spec_helper'
 
-describe Batch do
-
-  before(:each) do
-    @batch = Batch.new
-  end
-
+describe Kafka::Batch do
   describe "batch messages" do
     it "holds all messages to be sent" do
-      @batch.should respond_to(:messages)
-      @batch.messages.class.should eql(Array)
+      subject.should respond_to(:messages)
+      subject.messages.class.should eql(Array)
     end
 
     it "supports queueing/adding messages to be send" do
-      @batch.messages << mock(Kafka::Message.new("one"))
-      @batch.messages << mock(Kafka::Message.new("two"))
-      @batch.messages.length.should eql(2)
+      subject.messages << double(Kafka::Message.new("one"))
+      subject.messages << double(Kafka::Message.new("two"))
+      subject.messages.length.should eql(2)
     end
   end
 end
